@@ -1,5 +1,8 @@
 # Python script to train a huggingface Model
 
+Made with Python 3.11.5
+
+Make sure to install all the needeed libraires with `pip install -r requirements.txt`
 
 Example usage:
 
