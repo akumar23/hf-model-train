@@ -1,0 +1,68 @@
+# Full configuration with HuggingFace Hub push
+# Production-ready template
+
+model:
+  base_model: "vilsonrodrigues/falcon-7b-instruct-sharded"
+  trust_remote_code: true
+  device_map: "auto"
+
+quantization:
+  load_in_4bit: true
+  use_double_quant: true
+  quant_type: "nf4"
+  compute_dtype: "bfloat16"
+
+lora:
+  r: 16
+  lora_alpha: 32
+  target_modules:
+    - "query_key_value"
+  lora_dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+
+dataset:
+  name: "Amod/mental_health_counseling_conversations"
+  train_split: "train"
+  prompt_template:
+    format: "<human>: {User}\n<assistant>: {Prompt}"
+    context_column: "Context"
+  max_length: 512
+  truncation: true
+  padding: true
+
+training:
+  num_epochs: 3
+  per_device_batch_size: 1
+  gradient_accumulation_steps: 4
+  learning_rate: 2.0e-4
+  lr_scheduler_type: "cosine"
+  warmup_ratio: 0.05
+  optimizer: "paged_adamw_8bit"
+  fp16: true
+  logging_steps: 10
+  save_steps: 100
+  save_total_limit: 3
+  gradient_checkpointing: true
+
+generation:
+  max_new_tokens: 200
+  temperature: 0.7
+  top_p: 0.7
+
+output:
+  model_dir: "mental-health-falcon"
+  experiments_dir: "experiments"
+  experiment_name: "falcon-mental-health-v1"
+  hub_repo: "your-username/mental-falcon-7b"
+  generate_config: true
+  push_tokenizer: true
+
+environment:
+  cuda_visible_devices: "0"
+  seed: 42
+
+logging:
+  level: "INFO"
+  log_to_file: true
+  log_to_console: true

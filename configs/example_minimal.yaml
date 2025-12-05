@@ -1,0 +1,15 @@
+# Minimal configuration example - only required fields
+# Use this as a starting template
+
+model:
+  base_model: "vilsonrodrigues/falcon-7b-instruct-sharded"
+
+dataset:
+  name: "Amod/mental_health_counseling_conversations"
+  prompt_template:
+    format: "<human>: {User}\n<assistant>: {Prompt}"
+    context_column: "Context"
+
+output:
+  model_dir: "my-finetuned-model"
+  experiment_name: "minimal-training"
