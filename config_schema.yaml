@@ -1,0 +1,215 @@
+# HuggingFace Model Fine-Tuning Configuration Schema
+# This is a complete reference for all available configuration options.
+# Copy this file and modify for your training run.
+
+# =============================================================================
+# MODEL CONFIGURATION
+# =============================================================================
+model:
+  # Required: HuggingFace model name or local path
+  base_model: "vilsonrodrigues/falcon-7b-instruct-sharded"
+
+  # Trust remote code (required for some models like Falcon)
+  trust_remote_code: true
+
+  # Device mapping strategy: "auto", "cuda:0", "cpu", or dict
+  device_map: "auto"
+
+# =============================================================================
+# QUANTIZATION CONFIGURATION (BitsAndBytes)
+# =============================================================================
+quantization:
+  # Enable 4-bit quantization
+  load_in_4bit: true
+
+  # Use double quantization for memory efficiency
+  use_double_quant: true
+
+  # Quantization type: "nf4" or "fp4"
+  quant_type: "nf4"
+
+  # Compute dtype: "bfloat16", "float16", or "float32"
+  compute_dtype: "bfloat16"
+
+# =============================================================================
+# LORA CONFIGURATION (PEFT)
+# =============================================================================
+lora:
+  # LoRA rank (dimension of low-rank matrices)
+  # Higher = more capacity but more memory. Common: 8, 16, 32, 64
+  r: 16
+
+  # LoRA alpha (scaling factor)
+  # Rule of thumb: alpha = 2 * r
+  lora_alpha: 32
+
+  # Target modules for LoRA adaptation
+  # Common options by model architecture:
+  #   - Falcon: ["query_key_value"]
+  #   - LLaMA/Mistral: ["q_proj", "v_proj", "k_proj", "o_proj"]
+  #   - GPT-2/GPT-J: ["attn.c_attn", "attn.c_proj"]
+  target_modules:
+    - "query_key_value"
+
+  # Dropout probability for LoRA layers
+  lora_dropout: 0.05
+
+  # Bias training: "none", "all", or "lora_only"
+  bias: "none"
+
+  # Task type: "CAUSAL_LM", "SEQ_2_SEQ_LM", "TOKEN_CLS", "SEQ_CLS"
+  task_type: "CAUSAL_LM"
+
+# =============================================================================
+# DATASET CONFIGURATION
+# =============================================================================
+dataset:
+  # Required: HuggingFace dataset name or local path
+  name: "Amod/mental_health_counseling_conversations"
+
+  # Dataset split to use for training
+  train_split: "train"
+
+  # Prompt template configuration
+  prompt_template:
+    # Template format with placeholders for dataset columns
+    format: "<human>: {User}\n<assistant>: {Prompt}"
+
+    # Column mappings (map template placeholders to actual dataset columns)
+    column_mapping:
+      User: "User"
+      Prompt: "Prompt"
+
+    # Optional: column to use for context/encoding
+    context_column: "Context"
+
+  # Maximum sequence length for tokenization
+  max_length: 512
+
+  # Truncation strategy: true/false
+  truncation: true
+
+  # Padding strategy: true, false, "max_length", "longest"
+  padding: true
+
+# =============================================================================
+# TRAINING CONFIGURATION
+# =============================================================================
+training:
+  # Number of training epochs
+  num_epochs: 3
+
+  # Batch size per device
+  per_device_batch_size: 1
+
+  # Gradient accumulation steps (effective batch = batch_size * grad_accum)
+  gradient_accumulation_steps: 4
+
+  # Learning rate
+  learning_rate: 2.0e-4
+
+  # Learning rate scheduler: "cosine", "linear", "constant", "polynomial"
+  lr_scheduler_type: "cosine"
+
+  # Warmup ratio (fraction of total steps)
+  warmup_ratio: 0.05
+
+  # Optimizer: "paged_adamw_8bit", "adamw_torch", "adamw_hf", "sgd"
+  optimizer: "paged_adamw_8bit"
+
+  # Enable FP16 mixed precision training
+  fp16: true
+
+  # Weight decay for regularization
+  weight_decay: 0.0
+
+  # Maximum gradient norm for clipping
+  max_grad_norm: 1.0
+
+  # Logging frequency (in steps)
+  logging_steps: 10
+
+  # Save checkpoint frequency (in steps)
+  save_steps: 100
+
+  # Maximum checkpoints to keep
+  save_total_limit: 3
+
+  # Enable gradient checkpointing (saves memory)
+  gradient_checkpointing: true
+
+  # Evaluation strategy: "no", "steps", "epoch"
+  evaluation_strategy: "no"
+
+# =============================================================================
+# GENERATION CONFIGURATION (for inference)
+# =============================================================================
+generation:
+  # Maximum new tokens to generate
+  max_new_tokens: 200
+
+  # Temperature for sampling
+  temperature: 0.7
+
+  # Top-p (nucleus) sampling threshold
+  top_p: 0.7
+
+  # Top-k sampling (0 = disabled)
+  top_k: 50
+
+  # Number of sequences to return
+  num_return_sequences: 1
+
+  # Enable/disable sampling (false = greedy decoding)
+  do_sample: true
+
+# =============================================================================
+# OUTPUT CONFIGURATION
+# =============================================================================
+output:
+  # Local directory for saving trained model
+  model_dir: "finetuned-model"
+
+  # Experiments base directory
+  experiments_dir: "experiments"
+
+  # Experiment name (used in directory naming)
+  experiment_name: "falcon-mental-health"
+
+  # Optional: HuggingFace Hub repository to push model
+  hub_repo: ""
+
+  # Whether to generate config.json after training
+  generate_config: true
+
+  # Whether to push tokenizer along with model
+  push_tokenizer: true
+
+# =============================================================================
+# ENVIRONMENT CONFIGURATION
+# =============================================================================
+environment:
+  # CUDA visible devices (comma-separated GPU indices)
+  cuda_visible_devices: "0"
+
+  # Random seed for reproducibility
+  seed: 42
+
+  # Enable deterministic operations
+  deterministic: false
+
+# =============================================================================
+# LOGGING CONFIGURATION
+# =============================================================================
+logging:
+  # Logging level: "DEBUG", "INFO", "WARNING", "ERROR"
+  level: "INFO"
+
+  # Log to file
+  log_to_file: true
+
+  # Log to console
+  log_to_console: true
+
+  # Enable verbose output
+  verbose: false
