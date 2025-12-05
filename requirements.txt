@@ -2,4 +2,9 @@ torch
 transformers
 datasets
 peft
-transformers
+bitsandbytes
+accelerate
+pyyaml
+scipy
+sentencepiece
+protobuf
