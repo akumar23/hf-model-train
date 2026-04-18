@@ -674,10 +674,10 @@ class ModelTrainer:
         self.tracker.log(f"Pushing model to HuggingFace Hub: {hub_repo}")
         
         try:
-            self.model.push_to_hub(hub_repo, use_auth_token=True)
-            
+            self.model.push_to_hub(hub_repo, token=True)
+
             if self.config.output.push_tokenizer:
-                self.tokenizer.push_to_hub(hub_repo, use_auth_token=True)
+                self.tokenizer.push_to_hub(hub_repo, token=True)
             
             self.tracker.log(f"Model pushed to Hub successfully!")
         except Exception as e:

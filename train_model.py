@@ -130,5 +130,5 @@ if len(args) > 4:
     PEFT_MODEL = args[4]
 
     model.push_to_hub(
-        PEFT_MODEL, use_auth_token=True
+        PEFT_MODEL, token=True
     )
